@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LifePilot AI - Mission Control Operating System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            bg: '#080c14',
+                            card: 'rgba(15, 23, 42, 0.75)',
+                            border: 'rgba(51, 65, 85, 0.5)',
+                            text: '#f8fafc',
+                            exec: '#3b82f6',     // Blue
+                            research: '#14b8a6', // Teal
+                            planner: '#10b981',  // Emerald
+                            risk: '#f97316',     // Orange
+                            finance: '#eab308',  // Yellow
+                            critic: '#a855f7',   // Purple
+                            system: '#64748b'    // Slate
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- React & Babel CDN for simple component execution -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Axios CDN -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <!-- Marked.js for markdown rendering -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <style>
+        body {
+            background-color: #080c14;
+            color: #f8fafc;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            overflow-x: hidden;
+        }
+        
+        /* Glassmorphism styling */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(51, 65, 85, 0.4);
+        }
+
+        /* Pulse glow animations */
+        @keyframes pulse-exec { 0%, 100% { border-color: rgba(59, 130, 246, 0.4); box-shadow: 0 0 5px rgba(59, 130, 246, 0.1); } 50% { border-color: rgba(59, 130, 246, 0.9); box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); } }
+        @keyframes pulse-research { 0%, 100% { border-color: rgba(20, 184, 166, 0.4); box-shadow: 0 0 5px rgba(20, 184, 166, 0.1); } 50% { border-color: rgba(20, 184, 166, 0.9); box-shadow: 0 0 15px rgba(20, 184, 166, 0.4); } }
+        @keyframes pulse-planner { 0%, 100% { border-color: rgba(16, 185, 129, 0.4); box-shadow: 0 0 5px rgba(16, 185, 129, 0.1); } 50% { border-color: rgba(16, 185, 129, 0.9); box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); } }
+        @keyframes pulse-risk { 0%, 100% { border-color: rgba(249, 115, 22, 0.4); box-shadow: 0 0 5px rgba(249, 115, 22, 0.1); } 50% { border-color: rgba(249, 115, 22, 0.9); box-shadow: 0 0 15px rgba(249, 115, 22, 0.4); } }
+        @keyframes pulse-finance { 0%, 100% { border-color: rgba(234, 179, 8, 0.4); box-shadow: 0 0 5px rgba(234, 179, 8, 0.1); } 50% { border-color: rgba(234, 179, 8, 0.9); box-shadow: 0 0 15px rgba(234, 179, 8, 0.4); } }
+        @keyframes pulse-critic { 0%, 100% { border-color: rgba(168, 85, 247, 0.4); box-shadow: 0 0 5px rgba(168, 85, 247, 0.1); } 50% { border-color: rgba(168, 85, 247, 0.9); box-shadow: 0 0 15px rgba(168, 85, 247, 0.4); } }
+        
+        .glow-exec { animation: pulse-exec 2s infinite; }
+        .glow-research { animation: pulse-research 2s infinite; }
+        .glow-planner { animation: pulse-planner 2s infinite; }
+        .glow-risk { animation: pulse-risk 2s infinite; }
+        .glow-finance { animation: pulse-finance 2s infinite; }
+        .glow-critic { animation: pulse-critic 2s infinite; }
+        
+        /* Hide scrollbars but keep functionality */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        /* Neon text glows */
+        .text-glow {
+            text-shadow: 0 0 8px rgba(248, 250, 252, 0.3);
+        }
+        
+        /* Markdown rendering overrides */
+        .markdown-content h1 { font-size: 1.5rem; font-weight: bold; margin-bottom: 0.75rem; border-bottom: 1px solid rgba(255, 255, 255, 0.15); padding-bottom: 0.25rem; }
+        .markdown-content h2 { font-size: 1.25rem; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem; color: #3b82f6; }
+        .markdown-content h3 { font-size: 1.1rem; font-weight: 600; margin-top: 0.75rem; margin-bottom: 0.25rem; color: #14b8a6; }
+        .markdown-content p { margin-bottom: 0.75rem; line-height: 1.6; font-size: 0.95rem; }
+        .markdown-content ul { list-style-type: disc; padding-left: 1.25rem; margin-bottom: 0.75rem; }
+        .markdown-content li { margin-bottom: 0.25rem; font-size: 0.95rem; }
+        .markdown-content table { width: 100%; border-collapse: collapse; margin: 1rem 0; font-size: 0.9rem; }
+        .markdown-content th { background: rgba(51, 65, 85, 0.5); padding: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.1); text-align: left; }
+        .markdown-content td { padding: 0.5rem; border: 1px solid rgba(255, 255, 255, 0.05); }
+        .markdown-content blockquote { border-left: 4px solid #3b82f6; padding-left: 0.75rem; color: #94a3b8; font-style: italic; margin-bottom: 0.75rem; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Custom hook to trigger Lucide icons reload
+        const useLucide = () => {
+            useEffect(() => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            });
+        };
+
+        function App() {
+            const [query, setQuery] = useState("I have ₹50,000 and 8 months. Should I learn AI Engineering, Cybersecurity, or Data Engineering?");
+            const [isRunning, setIsRunning] = useState(false);
+            const [sessionId, setSessionId] = useState("");
+            const [sessionStatus, setSessionStatus] = useState("IDLE"); // IDLE, RUNNING, COMPLETED, FAILED
+            const [agents, setAgents] = useState([]);
+            
+            // Agent Activity Map (Active Agent Name -> State: 'THINKING', 'DEBATING', 'DONE')
+            const [agentActivities, setAgentActivities] = useState({
+                ExecutiveAgent: 'IDLE',
+                ResearchAgent: 'IDLE',
+                PlannerAgent: 'IDLE',
+                RiskAgent: 'IDLE',
+                FinanceAgent: 'IDLE',
+                CriticAgent: 'IDLE'
+            });
+
+            const [traces, setTraces] = useState([]);
+            const [pendingApprovals, setPendingApprovals] = useState([]);
+            const [sandboxFiles, setSandboxFiles] = useState([]);
+            const [activeFile, setActiveFile] = useState(null);
+            const [activeFileContent, setActiveFileContent] = useState("");
+            const [finalReport, setFinalReport] = useState("");
+            
+            // Agent Builder State
+            const [builderPrompt, setBuilderPrompt] = useState("");
+            const [builderLoading, setBuilderLoading] = useState(false);
+            const [builderMessage, setBuilderMessage] = useState("");
+
+            const terminalEndRef = useRef(null);
+            const eventSourceRef = useRef(null);
+
+            useLucide();
+
+            // Fetch agents list
+            const fetchAgents = async () => {
+                try {
+                    const res = await axios.get("/api/agents");
+                    setAgents(res.data);
+                } catch (e) {
+                    console.error("Error fetching agents", e);
+                }
+            };
+
+            // Fetch sandbox files
+            const fetchSandboxFiles = async () => {
+                try {
+                    const res = await axios.get("/api/sandbox/files");
+                    setSandboxFiles(res.data.files || []);
+                } catch (e) {
+                    console.error("Error fetching files", e);
+                }
+            };
+
+            useEffect(() => {
+                fetchAgents();
+                fetchSandboxFiles();
+            }, []);
+
+            // Scroll terminal to bottom on new trace
+            useEffect(() => {
+                if (terminalEndRef.current) {
+                    terminalEndRef.current.scrollIntoView({ behavior: 'smooth' });
+                }
+            }, [traces]);
+
+            // SSE Event stream listener
+            const startEventStream = (sessId) => {
+                if (eventSourceRef.current) {
+                    eventSourceRef.current.close();
+                }
+
+                const es = new EventSource(`/api/stream/${sessId}`);
+                eventSourceRef.current = es;
+
+                es.addEventListener("trace", (e) => {
+                    const trace = JSON.parse(e.data);
+                    setTraces(prev => [...prev, trace]);
+                    
+                    // Update agent states based on traces
+                    const agent = trace.agent_name;
+                    const step = trace.step_type;
+                    
+                    setAgentActivities(prev => {
+                        const updated = { ...prev };
+                        if (step === "DEBATE") {
+                            updated.CriticAgent = "DEBATING";
+                        } else if (step === "TOOL_CALL") {
+                            updated[agent] = "TOOL_CALL";
+                        } else if (step === "TOOL_RESPONSE") {
+                            updated[agent] = "THINKING";
+                        } else if (step === "STATUS") {
+                            // System update
+                        } else {
+                            updated[agent] = "THINKING";
+                        }
+                        return updated;
+                    });
+                });
+
+                es.addEventListener("approval_required", (e) => {
+                    const approval = JSON.parse(e.data);
+                    setPendingApprovals(prev => {
+                        // Check if already in list
+                        if (prev.some(a => a.id === approval.id)) return prev;
+                        return [...prev, approval];
+                    });
+                });
+
+                es.addEventListener("done", async (e) => {
+                    setSessionStatus("COMPLETED");
+                    setIsRunning(false);
+                    es.close();
+                    
+                    // Fetch completed session details
+                    try {
+                        const res = await axios.get(`/api/sessions/${sessId}`);
+                        setFinalReport(res.data.final_report || "Workflow completed, but no report generated.");
+                    } catch (err) {
+                        console.error("Error fetching final report", err);
+                    }
+                    
+                    // Reset all agent states to completed/idle
+                    setAgentActivities({
+                        ExecutiveAgent: 'DONE',
+                        ResearchAgent: 'DONE',
+                        PlannerAgent: 'DONE',
+                        RiskAgent: 'DONE',
+                        FinanceAgent: 'DONE',
+                        CriticAgent: 'DONE'
+                    });
+                    
+                    fetchSandboxFiles();
+                });
+
+                es.onerror = (err) => {
+                    console.error("SSE stream error", err);
+                    es.close();
+                };
+            };
+
+            // Run Query
+            const handleRunQuery = async () => {
+                if (isRunning) return;
+                setIsRunning(true);
+                setSessionStatus("RUNNING");
+                setTraces([]);
+                setPendingApprovals([]);
+                setFinalReport("");
+                setActiveFile(null);
+                setActiveFileContent("");
+                
+                // Set agents back to thinking
+                setAgentActivities({
+                    ExecutiveAgent: 'IDLE',
+                    ResearchAgent: 'IDLE',
+                    PlannerAgent: 'IDLE',
+                    RiskAgent: 'IDLE',
+                    FinanceAgent: 'IDLE',
+                    CriticAgent: 'IDLE'
+                });
+
+                try {
+                    const res = await axios.post("/api/query", { query });
+                    const newSessId = res.data.session_id;
+                    setSessionId(newSessId);
+                    startEventStream(newSessId);
+                } catch (e) {
+                    setIsRunning(false);
+                    setSessionStatus("FAILED");
+                    const errorMsg = e.response?.data?.detail || "Could not launch multi-agent session.";
+                    alert(errorMsg);
+                }
+            };
+
+            // Approve/Deny a blocked tool execution
+            const handleApprovalAction = async (approvalId, action) => {
+                try {
+                    await axios.post(`/api/approvals/${approvalId}`, { status: action });
+                    // Remove from pending list
+                    setPendingApprovals(prev => prev.filter(a => a.id !== approvalId));
+                } catch (e) {
+                    console.error("Error submitting approval", e);
+                }
+            };
+
+            // Create custom Agent builder
+            const handleCreateAgent = async (e) => {
+                e.preventDefault();
+                const prompt = builderPrompt.trim();
+                if (!prompt || builderLoading) return;
+
+                setBuilderLoading(true);
+                setBuilderMessage("");
+                try {
+                    const res = await axios.post("/api/build-agent", { prompt });
+                    setBuilderMessage(`Success! Registered new agent: ${res.data.name}.`);
+                    setBuilderPrompt("");
+                    fetchAgents();
+                } catch (err) {
+                    const msg = err.response?.data?.detail || "Failed to create agent.";
+                    setBuilderMessage(`Error: ${msg}`);
+                } finally {
+                    setBuilderLoading(false);
+                }
+            };
+
+            // View sandbox file
+            const viewSandboxFile = async (name) => {
+                setActiveFile(name);
+                setActiveFileContent("Loading file content...");
+                try {
+                    const res = await axios.get(`/api/sandbox/files/${name}`);
+                    setActiveFileContent(res.data.content);
+                } catch (e) {
+                    setActiveFileContent("Failed to load file contents.");
+                }
+            };
+
+            // Render Markdown
+            const renderMarkdown = (text) => {
+                if (!text) return "";
+                return { __html: marked.parse(text) };
+            };
+
+            // Returns neon border glowing classes based on agent state
+            const getAgentCardClass = (name) => {
+                const state = agentActivities[name] || 'IDLE';
+                if (state === 'THINKING' || state === 'TOOL_CALL') {
+                    if (name === "ExecutiveAgent") return "glow-exec border-blue-500 bg-blue-950/20";
+                    if (name === "ResearchAgent") return "glow-research border-teal-500 bg-teal-950/20";
+                    if (name === "PlannerAgent") return "glow-planner border-emerald-500 bg-emerald-950/20";
+                    if (name === "RiskAgent") return "glow-risk border-orange-500 bg-orange-950/20";
+                    if (name === "FinanceAgent") return "glow-finance border-yellow-500 bg-yellow-950/20";
+                    if (name === "CriticAgent") return "glow-critic border-purple-500 bg-purple-950/20";
+                }
+                if (state === 'DEBATING') {
+                    return "glow-critic border-purple-600 bg-purple-950/30 animate-pulse";
+                }
+                if (state === 'DONE') {
+                    return "border-emerald-700 bg-emerald-950/10";
+                }
+                return "border-slate-800 bg-slate-900/60";
+            };
+
+            // Get badge color based on Agent name
+            const getAgentBadgeColor = (name) => {
+                if (name === "ExecutiveAgent") return "bg-blue-900/40 text-blue-300 border-blue-800";
+                if (name === "ResearchAgent") return "bg-teal-900/40 text-teal-300 border-teal-800";
+                if (name === "PlannerAgent") return "bg-emerald-900/40 text-emerald-300 border-emerald-800";
+                if (name === "RiskAgent") return "bg-orange-900/40 text-orange-300 border-orange-800";
+                if (name === "FinanceAgent") return "bg-yellow-900/40 text-yellow-300 border-yellow-800";
+                if (name === "CriticAgent") return "bg-purple-900/40 text-purple-300 border-purple-800";
+                if (name === "System") return "bg-slate-800 text-slate-300 border-slate-700";
+                return "bg-pink-900/40 text-pink-300 border-pink-800"; // Dynamic Custom agents
+            };
+
+            return (
+                <div className="min-h-screen flex flex-col pb-8">
+                    {/* Header */}
+                    <header className="border-b border-slate-800 bg-slate-950/50 backdrop-blur-md px-6 py-4 flex flex-wrap justify-between items-center gap-4">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                                <i data-lucide="navigation" className="text-white w-6 h-6 animate-pulse"></i>
+                            </div>
+                            <div>
+                                <h1 className="text-xl font-bold tracking-wider text-glow flex items-center gap-2">
+                                    LIFEPILOT <span className="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full font-mono border border-blue-500/30">OPERATING SYSTEM</span>
+                                </h1>
+                                <p className="text-xs text-slate-400">Google ADK Multi-Agent CAPSTONE Project</p>
+                            </div>
+                        </div>
+
+                        <div className="flex items-center gap-6">
+                            <div className="flex items-center gap-2">
+                                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                                <span className="text-xs text-slate-300 font-mono">CONNECTION: ONLINE</span>
+                            </div>
+                            <div className="text-xs text-slate-400 font-mono">
+                                ACTIVE AGENTS: <span className="text-white font-bold">{agents.length}</span>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Dashboard Workspace */}
+                    <div className="flex-1 grid grid-cols-1 xl:grid-cols-12 gap-6 p-6">
+                        
+                        {/* LEFT COLUMN: Input controls & Agent Builder */}
+                        <div className="xl:col-span-3 flex flex-col gap-6">
+                            
+                            {/* Input Query Panel */}
+                            <div className="glass-panel rounded-2xl p-5 flex flex-col gap-4">
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-sm font-semibold tracking-wider text-slate-300 flex items-center gap-2">
+                                        <i data-lucide="terminal" className="w-4 h-4 text-blue-400"></i> MISSION REQUEST
+                                    </h3>
+                                    {isRunning && <span className="text-xs text-blue-400 font-mono animate-pulse">SOLVING...</span>}
+                                </div>
+                                
+                                <textarea 
+                                    className="w-full h-32 bg-slate-950/80 border border-slate-800 rounded-xl p-3 text-sm focus:outline-none focus:border-blue-500 transition-all font-sans text-slate-300"
+                                    placeholder="Enter your decision query..."
+                                    value={query}
+                                    onChange={(e) => setQuery(e.target.value)}
+                                    disabled={isRunning}
+                                />
+                                
+                                <button
+                                    onClick={handleRunQuery}
+                                    disabled={isRunning}
+                                    className="w-full py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:from-slate-800 disabled:to-slate-800 disabled:cursor-not-allowed rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-lg shadow-blue-500/10 hover:shadow-blue-500/20 active:scale-[0.98] transition-all"
+                                >
+                                    <i data-lucide="play" className="w-4 h-4"></i> ANALYZE STRATEGY
+                                </button>
+                            </div>
+
+                            {/* Antigravity Agent Builder */}
+                            <div className="glass-panel rounded-2xl p-5 flex flex-col gap-4">
+                                <h3 className="text-sm font-semibold tracking-wider text-slate-300 flex items-center gap-2">
+                                    <i data-lucide="cpu" className="w-4 h-4 text-purple-400"></i> ANTIGRAVITY AGENT BUILDER
+                                </h3>
+                                <p className="text-xs text-slate-400">Dynamically compile, test, configure, and register a new specialist agent in real-time.</p>
+                                
+                                <form onSubmit={handleCreateAgent} className="flex flex-col gap-3">
+                                    <input 
+                                        type="text"
+                                        className="w-full bg-slate-950/80 border border-slate-800 rounded-xl p-3 text-xs focus:outline-none focus:border-purple-500 transition-all text-slate-300 font-mono"
+                                        placeholder="e.g. 'Create a Startup Advisor Agent'"
+                                        value={builderPrompt}
+                                        onChange={(e) => setBuilderPrompt(e.target.value)}
+                                        disabled={builderLoading}
+                                    />
+                                    <button
+                                        type="submit"
+                                        disabled={builderLoading || !builderPrompt.trim()}
+                                        className="py-2.5 bg-purple-700/30 border border-purple-500/30 hover:bg-purple-600 hover:border-purple-500 hover:text-white text-purple-300 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all"
+                                    >
+                                        {builderLoading ? (
+                                            <span className="w-4 h-4 border-2 border-purple-300 border-t-transparent rounded-full animate-spin"></span>
+                                        ) : (
+                                            <i data-lucide="plus-circle" className="w-4 h-4"></i>
+                                        )}
+                                        COMPILE NEW AGENT
+                                    </button>
+                                </form>
+                                {builderMessage && (
+                                    <div className="text-[10px] font-mono p-2 bg-slate-950/60 border border-slate-800 rounded-lg text-slate-400 max-h-20 overflow-y-auto">
+                                        {builderMessage}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Sandbox Files Explorer */}
+                            <div className="glass-panel rounded-2xl p-5 flex flex-col gap-3 flex-1 min-h-[200px]">
+                                <h3 className="text-sm font-semibold tracking-wider text-slate-300 flex items-center gap-2">
+                                    <i data-lucide="folder" className="w-4 h-4 text-emerald-400"></i> SANDBOX REPOSITORY
+                                </h3>
+                                <div className="flex-1 overflow-y-auto no-scrollbar flex flex-col gap-1.5 max-h-[250px]">
+                                    {sandboxFiles.length === 0 ? (
+                                        <span className="text-xs text-slate-500 font-mono italic">No artifacts written yet.</span>
+                                    ) : (
+                                        sandboxFiles.map((file, idx) => (
+                                            <div 
+                                                key={idx}
+                                                onClick={() => viewSandboxFile(file)}
+                                                className={`p-2.5 rounded-lg border text-xs font-mono flex items-center gap-2 cursor-pointer transition-all ${
+                                                    activeFile === file 
+                                                        ? 'bg-emerald-950/20 border-emerald-500 text-emerald-300' 
+                                                        : 'bg-slate-950/40 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
+                                                }`}
+                                            >
+                                                <i data-lucide="file-text" className="w-3.5 h-3.5"></i>
+                                                {file}
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* MIDDLE COLUMN: Agent Grid visualizer / Debate & File Contents */}
+                        <div className="xl:col-span-5 flex flex-col gap-6">
+                            
+                            {/* Mission Control Visualizer */}
+                            <div className="glass-panel rounded-2xl p-5 flex flex-col gap-4">
+                                <h3 className="text-sm font-semibold tracking-wider text-slate-300 flex items-center gap-2">
+                                    <i data-lucide="activity" className="w-4 h-4 text-teal-400"></i> AGENT BOARDING CHART
+                                </h3>
+                                
+                                <div className="grid grid-cols-2 gap-4">
+                                    {/* Executive Agent Card */}
+                                    <div className={`p-4 rounded-xl border transition-all flex flex-col gap-2 ${getAgentCardClass("ExecutiveAgent")}`}>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-lg bg-blue-600/20 flex items-center justify-center border border-blue-500/30">
+                                                <i data-lucide="shield" className="w-4 h-4 text-blue-400"></i>
+                                            </div>
+                                            <div>
+                                                <h4 className="text-xs font-bold text-slate-200">Executive</h4>
+                                                <span className="text-[10px] text-slate-400 font-mono">Status: {agentActivities.ExecutiveAgent || 'IDLE'}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Critic Agent Card */}
+                                    <div className={`p-4 rounded-xl border transition-all flex flex-col gap-2 ${getAgentCardClass("CriticAgent")}`}>
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 rounded-lg bg-purple-600/20 flex items-center justify-center border border-purple-500/30">
+                                                <i data-lucide="message-square" className="w-4 h-4 text-purple-400"></i>
+                                            </div>
+                                            <div>
+                                                <h4 className="text-xs font-bold text-slate-200">Critic</h4>
+                                                <span className="text-[10px] text-slate-400 font-mono">Status: {agentActivities.CriticAgent || 'IDLE'}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="h-px bg-slate-800"></div>
+
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                    {/* Research */}
+                                    <div className={`p-3 rounded-lg border text-center transition-all ${getAgentCardClass("ResearchAgent")}`}>
+                                        <i data-lucide="search" className="w-5 h-5 mx-auto text-teal-400 mb-1.5"></i>
+                                        <h5 className="text-[11px] font-bold text-slate-200">Research</h5>
+                                        <span className="text-[9px] text-slate-400 font-mono">{agentActivities.ResearchAgent}</span>
+                                    </div>
+
+                                    {/* Planner */}
+                                    <div className={`p-3 rounded-lg border text-center transition-all ${getAgentCardClass("PlannerAgent")}`}>
+                                        <i data-lucide="calendar" className="w-5 h-5 mx-auto text-emerald-400 mb-1.5"></i>
+                                        <h5 className="text-[11px] font-bold text-slate-200">Planner</h5>
+                                        <span className="text-[9px] text-slate-400 font-mono">{agentActivities.PlannerAgent}</span>
+                                    </div>
+
+                                    {/* Risk */}
+                                    <div className={`p-3 rounded-lg border text-center transition-all ${getAgentCardClass("RiskAgent")}`}>
+                                        <i data-lucide="alert-triangle" className="w-5 h-5 mx-auto text-orange-400 mb-1.5"></i>
+                                        <h5 className="text-[11px] font-bold text-slate-200">Risk</h5>
+                                        <span className="text-[9px] text-slate-400 font-mono">{agentActivities.RiskAgent}</span>
+                                    </div>
+
+                                    {/* Finance */}
+                                    <div className={`p-3 rounded-lg border text-center transition-all ${getAgentCardClass("FinanceAgent")}`}>
+                                        <i data-lucide="dollar-sign" className="w-5 h-5 mx-auto text-yellow-400 mb-1.5"></i>
+                                        <h5 className="text-[11px] font-bold text-slate-200">Finance</h5>
+                                        <span className="text-[9px] text-slate-400 font-mono">{agentActivities.FinanceAgent}</span>
+                                    </div>
+                                </div>
+                                
+                                {/* Dynamic list of user created agents */}
+                                {agents.some(a => a.custom) && (
+                                    <div className="mt-2">
+                                        <span className="text-[10px] text-slate-500 font-mono block mb-2 uppercase">Custom Dynamic Agents</span>
+                                        <div className="flex flex-wrap gap-2">
+                                            {agents.filter(a => a.custom).map((a, idx) => {
+                                                const act = agentActivities[a.name] || 'IDLE';
+                                                const glow = act === 'THINKING' ? 'border-pink-500 bg-pink-950/20' : 'border-slate-800 bg-slate-950/50';
+                                                return (
+                                                    <div key={idx} className={`px-3 py-1.5 rounded-lg border text-xs font-mono flex items-center gap-1.5 ${glow}`}>
+                                                        <span className={`w-1.5 h-1.5 rounded-full ${act === 'THINKING' ? 'bg-pink-500 animate-ping' : 'bg-slate-500'}`}></span>
+                                                        {a.name}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Artifact File Viewer / Markdown Sandbox Viewer */}
+                            {activeFile && (
+                                <div className="glass-panel rounded-2xl p-5 flex flex-col flex-1 min-h-[300px]">
+                                    <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+                                        <h3 className="text-sm font-semibold tracking-wider text-slate-300 flex items-center gap-2 font-mono">
+                                            <i data-lucide="file-text" className="w-4 h-4 text-emerald-400"></i> {activeFile}
+                                        </h3>
+                                        <button 
+                                            onClick={() => setActiveFile(null)}
+                                            className="text-xs text-slate-500 hover:text-slate-300 font-mono"
+                                        >
+                                            CLOSE
+                                        </button>
+                                    </div>
+                                    <div className="flex-1 overflow-y-auto no-scrollbar font-mono text-xs text-slate-300 bg-slate-950/50 p-4 border border-slate-900 rounded-xl leading-relaxed whitespace-pre-wrap">
+                                        {activeFile.endsWith(".md") ? (
+                                            <div className="markdown-content" dangerouslySetInnerHTML={renderMarkdown(activeFileContent)} />
+                                        ) : (
+                                            activeFileContent
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* RIGHT COLUMN: Terminal Stream & Tool Approvals */}
+                        <div className="xl:col-span-4 flex flex-col gap-6">
+                            
+                            {/* Human-in-the-loop approvals interceptor panel */}
+                            {pendingApprovals.length > 0 && (
+                                <div className="p-5 bg-orange-950/30 border border-orange-500/50 rounded-2xl shadow-lg shadow-orange-500/10 flex flex-col gap-3">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="text-sm font-bold text-orange-400 flex items-center gap-2">
+                                            <i data-lucide="shield-alert" className="w-5 h-5 animate-bounce"></i> SECURITY APPROVAL REQUIRED
+                                        </h3>
+                                        <span className="text-[10px] bg-orange-500/20 text-orange-300 px-2 py-0.5 rounded border border-orange-500/30 font-mono">BLOCKED</span>
+                                    </div>
+                                    {pendingApprovals.map((appr) => (
+                                        <div key={appr.id} className="bg-slate-950/80 rounded-xl p-3 border border-slate-800 flex flex-col gap-3 font-mono text-xs">
+                                            <div>
+                                                <span className="text-slate-500">Agent:</span> <span className="text-purple-400">{appr.agent_name}</span>
+                                            </div>
+                                            <div>
+                                                <span className="text-slate-500">Tool:</span> <span className="text-orange-400 font-bold">{appr.tool_name}</span>
+                                            </div>
+                                            <div>
+                                                <span className="text-slate-500 block mb-1">Parameters:</span>
+                                                <pre className="p-2 bg-slate-900 border border-slate-800/80 rounded-lg text-slate-300 text-[10px] overflow-x-auto whitespace-pre-wrap max-h-28">
+                                                    {JSON.stringify(appr.arguments, null, 2)}
+                                                </pre>
+                                            </div>
+                                            <div className="flex gap-2 mt-1">
+                                                <button
+                                                    onClick={() => handleApprovalAction(appr.id, "APPROVED")}
+                                                    className="flex-1 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-lg text-xs tracking-wider transition-all"
+                                                >
+                                                    ALLOW EXECUTION
+                                                </button>
+                                                <button
+                                                    onClick={() => handleApprovalAction(appr.id, "DENIED")}
+                                                    className="flex-1 py-2 bg-rose-600/30 hover:bg-rose-600/60 border border-rose-500/30 text-rose-300 font-semibold rounded-lg text-xs tracking-wider transition-all"
+                                                >
+                                                    DENY
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+
+                            {/* Live Agent Terminal Stream */}
+                            <div className="glass-panel rounded-2xl p-5 flex flex-col flex-1 min-h-[400px]">
+                                <h3 className="text-sm font-semibold tracking-wider text-slate-300 border-b border-slate-800 pb-3 flex items-center gap-2">
+                                    <i data-lucide="terminal" className="w-4 h-4 text-indigo-400"></i> AGENT COLLABORATION TERMINAL
+                                </h3>
+                                
+                                <div className="flex-1 overflow-y-auto no-scrollbar font-mono text-xs py-3 flex flex-col gap-3 max-h-[500px]">
+                                    {traces.length === 0 ? (
+                                        <div className="text-slate-500 italic p-2">System idle. Initiate a query to stream agent reasoning.</div>
+                                    ) : (
+                                        traces.map((trace) => {
+                                            const badgeColor = getAgentBadgeColor(trace.agent_name);
+                                            return (
+                                                <div key={trace.id} className="flex flex-col gap-1 border-b border-slate-900/60 pb-2">
+                                                    <div className="flex items-center justify-between">
+                                                        <span className={`px-2 py-0.5 rounded text-[9px] border font-bold uppercase tracking-wider ${badgeColor}`}>
+                                                            {trace.agent_name}
+                                                        </span>
+                                                        <span className="text-[9px] text-slate-500 font-light">
+                                                            {new Date(trace.created_at).toLocaleTimeString()}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-slate-300 leading-relaxed text-[11px] whitespace-pre-wrap">
+                                                        {trace.content}
+                                                    </p>
+                                                </div>
+                                            );
+                                        })
+                                    )}
+                                    <div ref={terminalEndRef} />
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    {/* BOTTOM SECTION: Finished Consensus Recommendation Report */}
+                    {finalReport && (
+                        <div className="px-6 mt-6">
+                            <div className="glass-panel rounded-2xl p-6 border-blue-500/30 bg-gradient-to-b from-blue-950/10 to-transparent">
+                                <h2 className="text-lg font-bold tracking-wider text-slate-200 border-b border-slate-800 pb-4 mb-4 flex items-center gap-2">
+                                    <i data-lucide="file-check" className="text-blue-400 w-5 h-5"></i> LIFEPILOT CAREER RECOMMENDATION REPORT
+                                </h2>
+                                <div 
+                                    className="markdown-content text-slate-300 font-sans leading-relaxed" 
+                                    dangerouslySetInnerHTML={renderMarkdown(finalReport)}
+                                />
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
