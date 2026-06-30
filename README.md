@@ -63,36 +63,6 @@ LifePilot AI is an AI-powered operating system built with the **Google Agent Dev
 
 ---
 
-## Folder Structure
-
-```
-lifepilot-ai/
-├── backend/
-│   ├── app/
-│   │   ├── agents/
-│   │   │   ├── dynamic/        # Custom generated agent files (configs, prompts, tests, Dockerfiles)
-│   │   │   ├── orchestrator.py # Multi-agent ADK execution graph
-│   │   │   ├── executive.py    # Executive Agent configurations
-│   │   │   ├── specialist.py   # Specialist agents config (Research, Planner, Risk, Finance, Critic)
-│   │   │   └── dynamic_loader.py # Dynamically loads custom user-created agents
-│   │   ├── mcp/
-│   │   │   └── tools.py        # Web, File, Calendar, Finance tools implementations
-│   │   ├── database.py         # SQLite connection and schema setup
-│   │   ├── models.py           # SQLAlchemy database tables
-│   │   ├── security.py         # Prompt injection and tool safety approvals
-│   │   ├── builder.py          # Antigravity dynamic agent compiler
-│   │   └── main.py             # FastAPI REST endpoints and SSE stream generator
-│   ├── .env.example            # Environment variables template
-│   └── Dockerfile              # Docker container configuration
-├── frontend/
-│   └── index.html              # Futuristic Mission Control dashboard SPA
-├── sandbox/                    # Directory for sandboxed File MCP reads/writes
-├── docker-compose.yml          # Container configuration
-└── README.md                   # This documentation
-```
-
----
-
 ## Setup & Local Installation
 
 ### Prerequisites
