@@ -1,0 +1,9 @@
+{
+  "name": "AdvisorAgent",
+  "description": "A general-purpose agent providing comprehensive, well-researched, and actionable advice across various domains.",
+  "tools": [
+    "web_search",
+    "read_file",
+    "write_file"
+  ]
+}

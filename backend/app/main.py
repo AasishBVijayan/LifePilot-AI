@@ -13,9 +13,8 @@ from dotenv import load_dotenv
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", ".env"))
 
 from .database import init_db, get_db
-from .models import SessionModel, AgentTraceModel, ToolApprovalModel, DynamicAgentModel
+from .models import SessionModel, AgentTraceModel, ToolApprovalModel
 from .agents.orchestrator import run_lifepilot_workflow
-from .builder import build_and_register_agent
 from .security import check_prompt_injection, SANDBOX_DIR
 
 logging.basicConfig(level=logging.INFO)
@@ -52,8 +51,6 @@ class QueryRequest(BaseModel):
 class ApprovalRequest(BaseModel):
     status: str  # APPROVED or DENIED
 
-class BuildAgentRequest(BaseModel):
-    prompt: str
 
 @app.post("/api/query")
 def start_query_session(request: QueryRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
@@ -89,7 +86,7 @@ def start_query_session(request: QueryRequest, background_tasks: BackgroundTasks
     db.commit()
     
     # Trigger multi-agent workflow in the background
-    background_tasks.add_task(run_lifepilot_workflow, session_id, query_text, db)
+    background_tasks.add_task(run_lifepilot_workflow, session_id, query_text)
     
     return {"session_id": session_id, "status": "PENDING"}
 
@@ -188,45 +185,18 @@ def handle_tool_approval(approval_id: str, request: ApprovalRequest, db: Session
     db.commit()
     return {"status": status}
 
-@app.post("/api/build-agent")
-def create_custom_agent(request: BuildAgentRequest, db: Session = Depends(get_db)):
-    """
-    Antigravity Feature: Dynamically builds and registers an agent.
-    """
-    prompt = request.prompt.strip()
-    if not prompt:
-        raise HTTPException(status_code=400, detail="Agent build prompt cannot be empty.")
-    try:
-        res = build_and_register_agent(prompt, db)
-        return res
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to generate agent: {str(e)}")
-
 @app.get("/api/agents")
-def list_available_agents(db: Session = Depends(get_db)):
+def list_available_agents():
     """
-    Lists static expert agents + custom database-registered agents.
+    Lists static expert agents.
     """
     static_agents = [
         {"name": "ExecutiveAgent", "role": "Orchestration & Synthesis", "tools": []},
         {"name": "ResearchAgent", "role": "Market Trends & Fact Finding", "tools": ["web_search"]},
         {"name": "PlannerAgent", "role": "Roadmaps & Timelines", "tools": ["write_file", "read_file", "create_calendar_event"]},
-        {"name": "RiskAgent", "role": "Blockers & Competition Analysis", "tools": ["read_file"]},
-        {"name": "FinanceAgent", "role": "ROI & Cost Estimations", "tools": ["calculate_roi"]},
         {"name": "CriticAgent", "role": "Internal Debate & Validation", "tools": []}
     ]
-    
-    db_agents = db.query(DynamicAgentModel).all()
-    dynamic_list = []
-    for a in db_agents:
-        dynamic_list.append({
-            "name": a.name,
-            "role": f"Custom: {a.description}",
-            "tools": json.loads(a.tools_config),
-            "custom": True
-        })
-        
-    return static_agents + dynamic_list
+    return static_agents
 
 @app.get("/api/sandbox/files")
 def list_sandbox_files():

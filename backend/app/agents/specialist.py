@@ -14,9 +14,10 @@ research_agent = Agent(
     description="Researches current job trends, technologies, market demands, and online courses.",
     instruction=(
         "You are an expert Research Agent. Your goal is to gather accurate, current information about "
-        "career tracks, tech stacks, market demand, salary trends, and learning resources using the "
-        "web_search tool. Focus on facts, statistics, and concrete data points. Present your findings "
-        "clearly and structured."
+        "career tracks, tech stacks, market demand, salary trends, and learning resources. "
+        "To keep execution fast, perform at most 1 or 2 high-quality, consolidated web searches total. "
+        "Avoid making many individual search calls. Focus on facts, statistics, and concrete data points, "
+        "and present your findings clearly and structured."
     ),
     tools=[web_search]
 )
@@ -25,15 +26,14 @@ research_agent = Agent(
 planner_agent = Agent(
     name="PlannerAgent",
     model=MODEL_NAME,
-    description="Creates step-by-step educational roadmaps, schedules calendar events, and writes files.",
+    description="Creates step-by-step educational roadmaps and writes files.",
     instruction=(
         "You are an expert Planner Agent. Your goal is to map out detailed step-by-step career and learning roadmaps "
         "based on the research findings. Break down timelines (e.g. months, weeks), estimate hours per day, "
-        "suggest projects to build, and list milestones. You can write reports to the sandbox using write_file "
-        "and schedule milestones using the create_calendar_event tool. Ensure your timeline is realistic "
-        "for the user's budget and constraints."
+        "suggest projects to build, and list milestones. Use the write_file tool to save the roadmap to the sandbox. "
+        "Ensure your timeline is realistic for the user's budget and constraints."
     ),
-    tools=[write_file, read_file, list_files, create_calendar_event]
+    tools=[write_file]
 )
 
 # Risk Agent: Evaluates blockers, failure rates, competition, and difficulties

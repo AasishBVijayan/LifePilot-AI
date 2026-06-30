@@ -1,19 +1,65 @@
 # LifePilot AI: Decision-Making Agent Operating System
 
-LifePilot AI is an AI-powered decision-making operating system where specialized agents collaborate to help users make important career, educational, business, and financial decisions. 
+LifePilot AI is an AI-powered operating system built with the **Google Agent Development Kit (ADK)** and Gemini. It orchestrates specialized agents to help users make career, education, and financial decisions through parallel reasoning, debate, and consensus.
 
-Built using the **Google Agent Development Kit (ADK)** and powered by Gemini, it features a futuristic **Mission Control Dashboard** displaying real-time agent logic streams, parallel execution charts, tool logs, and interactive human-in-the-loop security approval popups.
+![LifePilot AI Architecture](lifepilot-ai/assets/architecture_diagram.png)
+
+---
+
+## What this repository contains
+
+- A Python backend service under `backend/`
+- A simple SPA frontend at `frontend/index.html`
+- A lightweight UI for submitting queries and streaming agent reasoning
+- A sandbox file explorer for Planner output
+- Docker Compose support via `docker-compose.yml`
+
+---
+
+## System Flow Diagram
+
+```text
+              [ USER QUERY ]
+                    │
+                    ▼
+          ┌───────────────────────┐
+          │  security_checkpoint  │
+          └───────────────────────┘
+                    │
+         ┌──────────┴──────────┐
+         │                     │
+    (SECURITY_EVENT)      (PASSED)
+         ▼                     ▼
+  ┌──────────────┐       ┌──────────────┐
+  │ security     │       │ orchestrator │
+  │ blocked      │       │  (Executive  │
+  └──────────────┘       │    Agent)    │
+                          └──────────────┘
+                                  │
+                   ┌──────────────┬──────────────┐
+                   ▼              ▼              ▼
+             ┌──────────┐   ┌────────────┐   ┌──────────┐
+             │Research  │   │ Planner    │   │ Critic   │
+             │ Agent    │   │ Agent      │   │ Agent    │
+             └──────────┘   └────────────┘   └──────────┘
+                   │              │              │
+                   ├──────────────┴──────────────┤
+                           ▼
+                     ┌──────────┐
+                     │ Executive│
+                     │ synthesis│
+                     └──────────┘
 
 ---
 
 ## Key Features
 
-1. **Google ADK multi-agent orchestration**: Uses sequential, parallel, and dynamic workflows to manage agent execution.
-2. **Debate & Consensus Framework**: A structured cycle where specialized agents draft plans, the **Critic Agent** challenges assumptions, agents refine their plans, and the **Executive Agent** compiles a final report.
-3. **Antigravity Agent Builder**: Automatically compiles, tests, configures, and registers brand-new agents in real time based on natural language commands (e.g., *"Create a Startup Advisor Agent"*).
-4. **MCP-Equivalent Tools**: Exposes Web Search (DuckDuckGo), File Manipulation, Calendar scheduling, and ROI Calculators to agents.
-5. **Interactive Tool Safety Interceptor**: Pauses execution and prompts the user in the UI to approve or deny dangerous operations (like file writes or calendar modifications).
-6. **Prompt Injection Protection**: Heuristic and pattern analysis layers checking inputs before model delegation.
+1. **Google ADK multi-agent orchestration**: Runs Executive, Research, Planner, and Critic agents in a simplified workflow.
+2. **Parallel specialist reasoning**: Research and Planner agents execute together to collect insights and generate a roadmap.
+3. **Critic review phase**: The Critic Agent validates the output before final synthesis.
+4. **Live terminal streaming**: Frontend streams agent reasoning traces from the backend in real time.
+5. **Sandbox file explorer**: Planner output files such as `roadmap.md` are saved and viewable.
+6. **Prompt injection protection**: User inputs are checked before workflow execution.
 
 ---
 
@@ -103,36 +149,3 @@ You can deploy the entire stack instantly using Docker Compose:
 3. Open `http://localhost:8000/` in your browser.
 
 ---
-
-## Hackathon Demo Script
-
-Here is a step-by-step walkthrough to present a winning demo:
-
-### Phase 1: The Core Value Proposition & UI
-1. Load `http://127.0.0.1:8000/` in front of the judges. Point out the dark glassmorphic **Mission Control** interface and explain that they are looking at an agentic operating system.
-2. Show the preloaded query: *"I have ₹50,000 and 8 months. Should I learn AI Engineering, Cybersecurity, or Data Engineering?"*
-3. Point out that the budget (₹50,000) and time (8 months) are hard constraints that the agents must evaluate.
-
-### Phase 2: Live Multi-Agent Execution & Parallelism
-1. Click **Analyze Strategy**.
-2. Show the **Agent Boarding Chart** immediately light up:
-   * Executive Agent turns blue (`THINKING`) as it deconstructs the request.
-   * Then, the Research, Planner, Risk, and Finance agents light up in green/gold (`THINKING` / `TOOL_CALL`) **in parallel**.
-3. Point out the **Agent Collaboration Terminal** scrolling in real time, showing the distinct reasoning lines of each agent.
-
-### Phase 3: Human-in-the-Loop Security & MCP Tools
-1. Draw the judges' attention to the **Security Approval Required** prompt popping up at the top of the terminal.
-2. Explain: *"The Planner Agent wants to schedule a milestone in the virtual calendar, and the security layer has intercepted the execution. Nothing runs without user consent."*
-3. Click **Allow Execution**. Watch the terminal resume, showing the tool response.
-4. Click the **Sandbox Repository** file list on the left. Click on `roadmap.md` and show them the beautiful learning roadmap written to the sandbox by the agent.
-
-### Phase 4: Debate, Consensus, and Final Report
-1. Scroll down the terminal to highlight the **Critic Agent** challenging assumptions: *"CHALLENGE: A budget of ₹50,000 is tight for professional bootcamps. Learning AI engineering requires GPUs which adds infrastructure costs..."*
-2. Show the specialists revising their plans in response to the Critic.
-3. Show the final synthesized **Career Recommendation Report** at the bottom of the page, presenting a clean ranking, risk analysis table, and financial projections.
-
-### Phase 5: The Antigravity Agent Builder (Wow Factor)
-1. Type: `Create a Startup Advisor Agent` in the Agent Builder input.
-2. Click **Compile New Agent**.
-3. Explain: *"In the background, Gemini is compiling a new agent configuration, generating a tailored system prompt, selecting tools, writing a python test suite, creating a Dockerfile, and registering it dynamically."*
-4. Once completed, show the new agent card immediately register in the **Agent Boarding Chart** under "Custom Dynamic Agents", ready to participate in the next decision query!

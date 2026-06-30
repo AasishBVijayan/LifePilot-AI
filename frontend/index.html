@@ -97,9 +97,8 @@
             </div>
             <div>
                 <h1 class="text-xl font-bold tracking-wider text-glow flex items-center gap-2">
-                    LIFEPILOT <span class="text-xs bg-blue-500/20 text-blue-400 px-2 py-0.5 rounded-full font-mono border border-blue-500/30">OPERATING SYSTEM</span>
+                    LIFEPILOT
                 </h1>
-                <p class="text-xs text-slate-400">Google ADK Multi-Agent CAPSTONE Project</p>
             </div>
         </div>
 
@@ -107,9 +106,6 @@
             <div class="flex items-center gap-2">
                 <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
                 <span class="text-xs text-slate-300 font-mono">CONNECTION: ONLINE</span>
-            </div>
-            <div class="text-xs text-slate-400 font-mono">
-                ACTIVE AGENTS: <span id="agents-count" class="text-white font-bold">6</span>
             </div>
         </div>
     </header>
@@ -143,31 +139,7 @@
                 </button>
             </div>
 
-            <!-- Antigravity Agent Builder -->
-            <div class="glass-panel rounded-2xl p-5 flex flex-col gap-4">
-                <h3 class="text-sm font-semibold tracking-wider text-slate-300 flex items-center gap-2">
-                    <i data-lucide="cpu" class="w-4 h-4 text-purple-400"></i> ANTIGRAVITY AGENT BUILDER
-                </h3>
-                <p class="text-xs text-slate-400">Dynamically compile, test, configure, and register a new specialist agent in real-time.</p>
-                
-                <div class="flex flex-col gap-3">
-                    <input 
-                        id="builder-input"
-                        type="text"
-                        class="w-full bg-slate-950/80 border border-slate-800 rounded-xl p-3 text-xs focus:outline-none focus:border-purple-500 transition-all text-slate-300 font-mono"
-                        placeholder="e.g. 'Create a Startup Advisor Agent'"
-                    />
-                    <button
-                        id="build-btn"
-                        class="py-2.5 bg-purple-700/30 border border-purple-500/30 hover:bg-purple-600 hover:border-purple-500 hover:text-white text-purple-300 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-all"
-                    >
-                        <i id="build-icon" data-lucide="plus-circle" class="w-4 h-4"></i>
-                        <span id="build-btn-text">COMPILE NEW AGENT</span>
-                    </button>
-                </div>
-                <div id="builder-status" class="text-[10px] font-mono p-2 bg-slate-950/60 border border-slate-800 rounded-lg text-slate-400 max-h-20 overflow-y-auto hidden">
-                </div>
-            </div>
+
 
             <!-- Sandbox Files Explorer -->
             <div class="glass-panel rounded-2xl p-5 flex flex-col gap-3 flex-1 min-h-[200px]">
@@ -219,7 +191,7 @@
 
                 <div class="h-px bg-slate-800"></div>
 
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="grid grid-cols-2 gap-3">
                     <!-- Research -->
                     <div id="card-ResearchAgent" class="p-3 rounded-lg border border-slate-800 bg-slate-900/60 text-center transition-all">
                         <i data-lucide="search" class="w-5 h-5 mx-auto text-teal-400 mb-1.5"></i>
@@ -233,28 +205,9 @@
                         <h5 class="text-[11px] font-bold text-slate-200">Planner</h5>
                         <span id="status-PlannerAgent" class="text-[9px] text-slate-400 font-mono">IDLE</span>
                     </div>
-
-                    <!-- Risk -->
-                    <div id="card-RiskAgent" class="p-3 rounded-lg border border-slate-800 bg-slate-900/60 text-center transition-all">
-                        <i data-lucide="alert-triangle" class="w-5 h-5 mx-auto text-orange-400 mb-1.5"></i>
-                        <h5 class="text-[11px] font-bold text-slate-200">Risk</h5>
-                        <span id="status-RiskAgent" class="text-[9px] text-slate-400 font-mono">IDLE</span>
-                    </div>
-
-                    <!-- Finance -->
-                    <div id="card-FinanceAgent" class="p-3 rounded-lg border border-slate-800 bg-slate-900/60 text-center transition-all">
-                        <i data-lucide="dollar-sign" class="w-5 h-5 mx-auto text-yellow-400 mb-1.5"></i>
-                        <h5 class="text-[11px] font-bold text-slate-200">Finance</h5>
-                        <span id="status-FinanceAgent" class="text-[9px] text-slate-400 font-mono">IDLE</span>
-                    </div>
                 </div>
                 
-                <!-- Dynamic list of user created agents -->
-                <div id="custom-agents-container" class="mt-2 hidden">
-                    <span class="text-[10px] text-slate-500 font-mono block mb-2 uppercase">Custom Dynamic Agents</span>
-                    <div id="custom-agents-list" class="flex flex-wrap gap-2">
-                    </div>
-                </div>
+
             </div>
 
             <!-- Artifact File Viewer / Markdown Sandbox Viewer -->
@@ -320,10 +273,6 @@
         const queryInput = document.getElementById('query-input');
         const runBtn = document.getElementById('run-btn');
         const solvingBadge = document.getElementById('solving-badge');
-        const builderInput = document.getElementById('builder-input');
-        const buildBtn = document.getElementById('build-btn');
-        const buildBtnText = document.getElementById('build-btn-text');
-        const builderStatus = document.getElementById('builder-status');
         const filesList = document.getElementById('files-list');
         const fileViewer = document.getElementById('file-viewer');
         const fileViewerTitle = document.getElementById('file-viewer-title');
@@ -335,15 +284,12 @@
         const terminalEmpty = document.getElementById('terminal-empty');
         const reportPanel = document.getElementById('report-panel');
         const reportContent = document.getElementById('report-content');
-        const customAgentsContainer = document.getElementById('custom-agents-container');
-        const customAgentsList = document.getElementById('custom-agents-list');
-        const agentsCount = document.getElementById('agents-count');
 
         let isRunning = false;
         let eventSource = null;
 
         // Static Agent list
-        const staticAgents = ["ExecutiveAgent", "ResearchAgent", "PlannerAgent", "RiskAgent", "FinanceAgent", "CriticAgent"];
+        const staticAgents = ["ExecutiveAgent", "ResearchAgent", "PlannerAgent", "CriticAgent"];
 
         // Init Lucide
         function reloadIcons() {
@@ -379,33 +325,8 @@
             }
         }
 
-        // Fetch agents list
-        async function fetchAgents() {
-            try {
-                const res = await fetch('/api/agents');
-                const agents = await res.json();
-                agentsCount.innerText = agents.length;
-
-                const customAgents = agents.filter(a => a.custom);
-                if (customAgents.length > 0) {
-                    customAgentsContainer.classList.remove('hidden');
-                    customAgentsList.innerHTML = customAgents.map(a => `
-                        <div id="card-${a.name}" class="px-3 py-1.5 rounded-lg border border-slate-800 bg-slate-950/50 text-xs font-mono flex items-center gap-1.5">
-                            <span id="dot-${a.name}" class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
-                            ${a.name}
-                        </div>
-                    `).join('');
-                } else {
-                    customAgentsContainer.classList.add('hidden');
-                }
-            } catch (e) {
-                console.error("Error fetching agents", e);
-            }
-        }
-
-        // Load files and agents on load
+        // Load files on load
         fetchSandboxFiles();
-        fetchAgents();
 
         // View single file contents
         async function viewFile(filename) {
@@ -423,7 +344,7 @@
                     fileViewerContent.innerHTML = `<pre class="whitespace-pre-wrap font-mono text-[11px]">${data.content}</pre>`;
                 }
             } catch (e) {
-                fileViewerContent.innerText = "Failed to load file contents.";
+                fileViewerContent.innerText = `Error loading file: ${e.message}`;
             }
         }
 
@@ -443,22 +364,12 @@
                     status.innerText = "Status: IDLE";
                 }
             });
-            // Reset custom agents
-            const customCards = customAgentsList.children;
-            for (let card of customCards) {
-                card.className = "px-3 py-1.5 rounded-lg border border-slate-800 bg-slate-950/50 text-xs font-mono flex items-center gap-1.5";
-                const dot = card.querySelector('span');
-                if (dot) {
-                    dot.className = "w-1.5 h-1.5 rounded-full bg-slate-500";
-                }
-            }
         }
 
         // Apply glow classes to card based on state
         function updateAgentState(agentName, state) {
             const card = document.getElementById(`card-${agentName}`);
             const status = document.getElementById(`status-${agentName}`);
-            const dot = document.getElementById(`dot-${agentName}`);
 
             if (!card) return;
 
@@ -471,21 +382,14 @@
                 else if (agentName === "RiskAgent") borderGlow = "glow-risk border-orange-500 bg-orange-950/20";
                 else if (agentName === "FinanceAgent") borderGlow = "glow-finance border-yellow-500 bg-yellow-950/20";
                 else if (agentName === "CriticAgent") borderGlow = "glow-critic border-purple-500 bg-purple-950/20";
-                else borderGlow = "border-pink-500 bg-pink-950/20"; // Custom agents
             } else if (state === "DONE") {
                 borderGlow = "border-emerald-700 bg-emerald-950/10";
             }
 
             // Apply card styling
-            if (staticAgents.includes(agentName)) {
-                card.className = `p-4 rounded-xl border transition-all flex flex-col gap-2 ${borderGlow}`;
+            card.className = `p-4 rounded-xl border transition-all flex flex-col gap-2 ${borderGlow}`;
+            if (status) {
                 status.innerText = `Status: ${state}`;
-            } else {
-                // Custom agent list style
-                card.className = `px-3 py-1.5 rounded-lg border text-xs font-mono flex items-center gap-1.5 ${borderGlow}`;
-                if (dot) {
-                    dot.className = `w-1.5 h-1.5 rounded-full ${state === "THINKING" ? 'bg-pink-500 animate-ping' : 'bg-emerald-500'}`;
-                }
             }
         }
 
@@ -676,39 +580,6 @@
             }
         });
 
-        // Agent Builder Submission
-        buildBtn.addEventListener('click', async () => {
-            const prompt = builderInput.value.trim();
-            if (!prompt) return;
-
-            buildBtn.disabled = true;
-            buildBtnText.innerText = "COMPILING...";
-            builderStatus.classList.remove('hidden');
-            builderStatus.innerText = "Analyzing requirements and writing python files...";
-
-            try {
-                const res = await fetch('/api/build-agent', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ prompt })
-                });
-
-                if (!res.ok) {
-                    const errData = await res.json();
-                    throw new Error(errData.detail || "Build error.");
-                }
-
-                const data = await res.json();
-                builderStatus.innerText = `Successfully compiled, tested, and registered agent: ${data.name}!\nDescription: ${data.description}\nTools: ${data.tools.join(', ')}`;
-                builderInput.value = "";
-                fetchAgents();
-            } catch (e) {
-                builderStatus.innerText = `Build failed: ${e.message}`;
-            } finally {
-                buildBtn.disabled = false;
-                buildBtnText.innerText = "COMPILE NEW AGENT";
-            }
-        });
     </script>
 </body>
 </html>
