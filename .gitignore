@@ -28,7 +28,8 @@ MANIFEST
 venv/
 ENV/
 env/
-backend/.env.example
+# Keep backend/.env.example in source control, ignore actual local env files via generic patterns below
+# backend/.env.example
 # IDE
 .vscode/
 .idea/
@@ -41,6 +42,9 @@ backend/.env.example
 .env
 .env.local
 .env.*.local
+
+# Terraform variable files
+*.tfvars
 
 # Database
 *.db

@@ -1,0 +1,44 @@
+LifePilot AI — Spoken Presentation Narration Script
+
+[0:00 — HOOK]
+Imagine standing at a career crossroads, holding a limited budget, and having only a few months to completely transform your professional life. Which path guarantees the highest return on investment, which skills are actually in demand, and how do you map out a realistic learning schedule without getting overwhelmed?
+(pause)
+Most people guess, browse scattered forums, or fall victim to marketing hype. Today, we are changing that.
+
+[0:20 — WHAT IT IS]
+Welcome to LifePilot AI, a decision-making agent operating system powered by Google's Agent Development Kit 2.0. LifePilot AI brings together a coordinated team of specialized AI agents to help you make complex, high-stakes life, career, and financial transitions.
+
+[0:40 — SHOW THE BANNER]
+(show assets/cover_page_banner.png)
+As you can see from our project banner, LifePilot AI is designed to be automated, secure, and intelligent. It is not just a chatbot. It is a structured multi-agent workspace where specialized agents collaborate, challenge each other, and build consensus to deliver a highly optimized decision blueprint.
+
+[1:00 — ARCHITECTURE]
+(show assets/architecture_diagram.png)
+Let's look at the engine under the hood. Our ADK 2.0 directed graph orchestrates the entire workflow.
+First, a user query enters the Security Checkpoint node. This node scrubs personal information and scans for prompt injections before the LLM ever sees the query, logging metadata to our local audit system.
+If it passes, the Orchestrator node—our Executive Agent—deconstructs the query. It delegates specialized tasks to our specialist sub-agents using Google's AgentTool framework.
+The Research Agent searches the web for live salaries, the Planner Agent drafts timelines, the Risk Agent identifies conceptual blockers, and the Finance Agent calculates educational ROI.
+All these drafts are sent to the Critic Agent node, which challenges unrealistic assumptions.
+Finally, the refined plan flows back to the Orchestrator. If the plan calls for writing local files or calendar schedules, the workflow suspends at the Human Approval node using a RequestInput interrupt, asking the operator for explicit consent. Only then does the Final Synthesis node compile the committed recommendation.
+
+[2:00 — LIVE DEMO]
+(switch to playground at localhost:18081)
+Let's see the live system in action.
+(pause)
+We will submit our primary test query: "I have fifty thousand rupees and eight months. Should I learn AI Engineering, Cybersecurity, or Data Engineering?"
+Notice how the graph lights up. The orchestrator deconstructs the request, and the specialists execute in parallel.
+Our Research Agent immediately triggers a web search. The Planner Agent drafts a timeline and writes it to our sandbox as 'roadmap.md'. The Finance Agent runs our ROI calculator tool to project a three-year return on investment based on expected starting salaries.
+(pause)
+Now, look at the screen: the playground has halted at our Human Approval node. It is prompting us: "LifePilot Operating System is proposing sandbox file writes and calendar milestones. Do you approve?"
+We click "Allow". The workflow resumes, incorporates our approval, and presents the final Career Recommendation Report in structured markdown, ranking the tracks, summarizing milestones, and outlining mitigation strategies for the risks.
+(pause)
+If we were to send a malicious prompt injection like "ignore previous instructions," you would see the security checkpoint immediately block the query, bypass the orchestrator, and route to our security event node, printing a warning.
+
+[3:00 — SECURITY & MCP]
+To make this possible, we built a local Model Context Protocol, or MCP server, running on stdio transport. It exposes four high-performance tools, giving our agents safe access to search the web, write reports to a sandbox, schedule calendar events, and run financial formulas.
+All file and calendar writes are fully sandboxed, and our security checkpoint ensures that no private emails, Aadhaar numbers, or phone numbers ever leave the local environment, keeping user privacy at a hundred percent.
+
+[3:30 — IMPACT / CLOSE]
+LifePilot AI demonstrates the true power of Google's ADK 2.0 framework. It takes agent development out of fragile scripts and into disciplined, secure, and production-ready software engineering. It is the ultimate co-pilot for career transitions, making high-stakes decisions objective, safe, and highly optimized.
+(pause)
+Thank you.

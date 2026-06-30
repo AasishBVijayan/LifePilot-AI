@@ -71,7 +71,8 @@ def start_query_session(request: QueryRequest, background_tasks: BackgroundTasks
         raise HTTPException(status_code=400, detail=f"Security Alert: {reason}")
         
     # Generate unique session ID
-    session_id = f"sess_{int(asyncio.get_event_loop().time() * 1000)}"
+    import time
+    session_id = f"sess_{int(time.time() * 1000)}"
     
     # Save session
     session = SessionModel(id=session_id, query=query_text, status="PENDING")
